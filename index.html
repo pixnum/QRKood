@@ -1,449 +1,347 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>QRKood - QR Code Generator</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
     :root {
-      --bg: #e0e5ec;
-      --fg: #1a1a1a;
-      --primary: #6750a4;
-      --primary-light: #957dad;
-      --secondary: #8a94a6;
-      --input-bg: #f0f0f3;
-      --input-fg: #333;
-      --card-shadow-light: 15px 15px 30px #c3c7d8,
-                          -15px -15px 30px #ffffff;
-      --card-shadow-dark: inset 6px 6px 8px #1c1c24,
-                         inset -6px -6px 8px #2e2e39;
-      --transition-speed: 0.35s;
-    }
-    [data-theme="dark"] {
-      --bg: #121318;
-      --fg: #e5e5e5;
-      --primary: #8a63d2;
-      --primary-light: #b398ec;
-      --secondary: #7f7f9d;
-      --input-bg: #1c1c24;
-      --input-fg: #ccc;
-      --card-shadow-light: none;
-      --card-shadow-dark: 6px 6px 12px #0a0a0f,
-                         -6px -6px 12px #262631;
-    }
-    * {
-      box-sizing: border-box;
-      outline-offset: 2px;
+      --bg-light: #f9f9f9;
+      --text-light: #222;
+      --bg-dark: #121212;
+      --text-dark: #eee;
+      --primary-color: #007bff;
+      --accent-color: #00c851;
+      --error-color: #ff4444;
+      --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     body {
-      margin: 0; padding: 0;
-      font-family: 'Poppins', sans-serif;
-      background: var(--bg);
-      color: var(--fg);
+      margin: 0;
+      font-family: var(--font-family);
+      background: var(--bg-light);
+      color: var(--text-light);
       display: flex;
       flex-direction: column;
-      align-items: center;
       min-height: 100vh;
-      user-select: none;
-      transition: background var(--transition-speed), color var(--transition-speed);
+      transition: background 0.3s, color 0.3s;
+    }
+    body[data-theme='dark'] {
+      background: var(--bg-dark);
+      color: var(--text-dark);
     }
     header {
-      position: sticky;
-      top: 0;
-      width: 100%;
-      background: var(--bg);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      padding: 1rem 1.5rem;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: var(--primary-color);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      user-select: none;
     }
     header h1 {
-      font-weight: 700;
-      font-size: 1.5rem;
-      letter-spacing: 2px;
-      color: var(--primary);
-      user-select: text;
       margin: 0;
+      font-weight: 700;
+      font-size: 1.8rem;
     }
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 28px;
-    }
-    .switch input { display:none; }
-    .slider {
+    .toggle-switch {
       position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 50px;
+      height: 24px;
+      display: inline-block;
+    }
+    .toggle-switch input {
+      display: none;
+    }
+    .slider {
+      position: relative;
       cursor: pointer;
-      inset: 0;
-      background: linear-gradient(145deg, #b7b9bf, #f0f0f3);
-      border-radius: 28px;
-      box-shadow: var(--card-shadow-light);
-      transition: 0.4s;
+      background-color: #ccc;
+      border-radius: 24px;
+      height: 100%;
+      transition: background-color 0.3s;
     }
-    [data-theme="dark"] .slider {
-      background: linear-gradient(145deg, #15151c, #1f1f28);
-      box-shadow: var(--card-shadow-dark);
-    }
-    .slider:before {
+    .slider::before {
       content: "";
       position: absolute;
-      height: 22px;
-      width: 22px;
+      height: 18px;
+      width: 18px;
       left: 3px;
       top: 3px;
       background: white;
       border-radius: 50%;
-      box-shadow:
-        0 2px 4px rgba(0,0,0,0.2),
-        inset 0 2px 2px rgba(255,255,255,0.7);
-      transition: 0.4s;
+      transition: transform 0.3s;
     }
     input:checked + .slider {
-      background: var(--primary);
-      box-shadow:
-        0 0 15px var(--primary-light),
-        inset 0 0 15px var(--primary-light);
+      background-color: var(--accent-color);
     }
-    input:checked + .slider:before {
-      transform: translateX(22px);
-      background: white;
-      box-shadow:
-        0 2px 6px var(--primary-light);
+    input:checked + .slider::before {
+      transform: translateX(26px);
     }
     main {
-      max-width: 720px;
-      width: 90vw;
-      margin-top: 2rem;
-      padding: 2rem 2.5rem;
-      background: var(--bg);
-      border-radius: 32px;
-      box-shadow: var(--card-shadow-light);
-      transition: box-shadow var(--transition-speed);
-      user-select: text;
+      flex: 1 0 auto;
+      max-width: 900px;
+      margin: 1rem auto 2rem;
+      padding: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      align-items: center;
     }
-    [data-theme="dark"] main {
-      box-shadow: var(--card-shadow-dark);
+    .controls, .options, .history-section, .bulk-section {
+      width: 100%;
+      max-width: 600px;
+      background: #fff;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgb(0 0 0 / 0.1);
+      transition: background 0.3s, color 0.3s;
+    }
+    body[data-theme='dark'] .controls,
+    body[data-theme='dark'] .options,
+    body[data-theme='dark'] .history-section,
+    body[data-theme='dark'] .bulk-section {
+      background: #1e1e1e;
+      color: var(--text-dark);
+      box-shadow: 0 0 15px rgb(255 255 255 / 0.1);
     }
     label {
-      font-weight: 600;
       display: block;
-      margin-bottom: 0.4rem;
-      color: var(--secondary);
-      user-select: text;
+      margin-bottom: 0.3rem;
+      font-weight: 600;
     }
-    select, input[type="text"], input[type="url"], input[type="email"], input[type="tel"],
-    input[type="password"], textarea, input[type="color"], input[type="number"], input[type="datetime-local"], input[type="file"] {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      font-size: 1rem;
-      border-radius: 18px;
-      border: none;
-      background: var(--input-bg);
-      color: var(--input-fg);
-      box-shadow:
-        7px 7px 12px #bec4d4,
-        -7px -7px 12px #ffffff;
-      transition: box-shadow var(--transition-speed);
-      resize: vertical;
-      user-select: text;
-      font-family: inherit;
-    }
-    [data-theme="dark"] select, [data-theme="dark"] input[type="text"], [data-theme="dark"] input[type="url"], [data-theme="dark"] input[type="email"], 
-    [data-theme="dark"] input[type="tel"], [data-theme="dark"] input[type="password"], [data-theme="dark"] textarea, [data-theme="dark"] input[type="color"], 
-    [data-theme="dark"] input[type="number"], [data-theme="dark"] input[type="datetime-local"], [data-theme="dark"] input[type="file"] {
-      box-shadow:
-        inset 3px 3px 6px #131316,
-        inset -3px -3px 6px #1c1c25;
-      background: var(--input-bg);
-      color: var(--input-fg);
-    }
-    select:focus, input:focus, textarea:focus {
-      outline: none;
-      box-shadow:
-        0 0 0 3px var(--primary-light);
-    }
+    input[type="text"],
+    input[type="email"],
+    input[type="url"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="password"],
+    input[type="datetime-local"],
+    select,
     textarea {
-      min-height: 80px;
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      resize: vertical;
+      background: #fff;
+      color: #222;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
     }
-    .flex-row {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: 1rem;
-    }
-    .flex-row > * {
-      flex: 1 1 150px;
-      min-width: 140px;
+    body[data-theme='dark'] input[type="text"],
+    body[data-theme='dark'] input[type="email"],
+    body[data-theme='dark'] input[type="url"],
+    body[data-theme='dark'] input[type="tel"],
+    body[data-theme='dark'] input[type="number"],
+    body[data-theme='dark'] input[type="password"],
+    body[data-theme='dark'] input[type="datetime-local"],
+    body[data-theme='dark'] select,
+    body[data-theme='dark'] textarea {
+      background: #2c2c2c;
+      color: var(--text-dark);
+      border: 1px solid #555;
     }
     button {
-      padding: 1rem 1.8rem;
-      margin-top: 1.2rem;
-      border-radius: 28px;
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--fg);
-      background: var(--bg);
-      box-shadow:
-        7px 7px 15px #bec4d4,
-        -7px -7px 15px #ffffff;
+      background-color: var(--primary-color);
+      color: white;
       border: none;
+      border-radius: 5px;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
       cursor: pointer;
-      user-select: none;
-      transition:
-        background-color 0.3s,
-        box-shadow 0.3s,
-        color 0.3s;
-      width: 100%;
-      max-width: 240px;
+      transition: background-color 0.3s;
+      margin-right: 0.5rem;
     }
-    button:hover, button:focus {
-      box-shadow:
-        inset 7px 7px 15px #bec4d4,
-        inset -7px -7px 15px #ffffff;
-      color: var(--primary);
-      background-color: var(--bg);
-      outline: none;
+    button:hover {
+      background-color: var(--accent-color);
     }
-    [data-theme="dark"] button {
-      box-shadow:
-        7px 7px 15px #121316,
-        -7px -7px 15px #2c2c35;
-      color: var(--fg);
+    button:disabled {
+      background-color: #999;
+      cursor: not-allowed;
     }
-    [data-theme="dark"] button:hover, [data-theme="dark"] button:focus {
-      box-shadow:
-        inset 7px 7px 15px #121316,
-        inset -7px -7px 15px #2c2c35;
-      color: var(--primary-light);
-      background-color: var(--bg);
+    #qrcode-container {
+      margin-top: 1rem;
+      text-align: center;
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgb(0 0 0 / 0.15);
+      max-width: 320px;
     }
-    #qrcode {
-      margin: 2rem auto;
-      position: relative;
-      width: fit-content;
-      max-width: 100%;
-      background: var(--input-bg);
-      padding: 1.5rem;
-      border-radius: 32px;
-      box-shadow:
-        8px 8px 16px #bec4d4,
-        -8px -8px 16px #ffffff;
-      user-select: none;
-      transition: box-shadow var(--transition-speed);
+    body[data-theme='dark'] #qrcode-container {
+      background: #222;
+      box-shadow: 0 0 12px rgb(255 255 255 / 0.15);
     }
-    [data-theme="dark"] #qrcode {
-      box-shadow:
-        8px 8px 20px #121316,
-        -8px -8px 20px #2c2c35;
-      background: var(--input-bg);
-    }
-    #qrcode canvas, #qrcode svg {
-      display: block;
+    #qrcode-container canvas {
       max-width: 100%;
       height: auto;
-      border-radius: 16px;
-      user-select: none;
     }
-    #logo-preview {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      max-width: 30%;
-      max-height: 30%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      opacity: 0.9;
-      border-radius: 50%;
-      box-shadow:
-        0 0 12px 3px var(--primary-light);
-      user-select: none;
+    .history-section, .bulk-section {
+      margin-top: 1rem;
     }
-    footer {
-      font-weight: 600;
-      font-size: 0.85rem;
-      margin: 2rem 0 1rem 0;
-      color: var(--secondary);
-      user-select: text;
+    #history-list div {
+      cursor: pointer;
+      padding: 0.4rem 0.6rem;
+      border-bottom: 1px solid #ddd;
+      font-size: 0.9rem;
+      outline: none;
     }
-    #video {
-      border-radius: 20px;
-      margin-top: 1.2rem;
-      box-shadow:
-        8px 8px 20px #bec4d4,
-        -8px -8px 20px #ffffff;
-      max-width: 100%;
-      user-select: none;
+    #history-list div:hover,
+    #history-list div:focus {
+      background-color: var(--accent-color);
+      color: white;
     }
-    [data-theme="dark"] #video {
-      box-shadow:
-        8px 8px 20px #121316,
-        -8px -8px 20px #2c2c35;
+    body[data-theme='dark'] #history-list div {
+      border-color: #444;
+    }
+    body[data-theme='dark'] #history-list div:hover,
+    body[data-theme='dark'] #history-list div:focus {
+      background-color: var(--accent-color);
+      color: white;
     }
     #scanResult {
-      margin-top: 1rem;
-      font-weight: 700;
-      color: var(--primary);
-      word-break: break-word;
-      user-select: text;
-    }
-    #history-list {
-      max-height: 160px;
-      overflow-y: auto;
-      border-radius: 20px;
-      background: var(--input-bg);
-      box-shadow:
-        inset 6px 6px 12px #ffffff,
-        inset -6px -6px 12px #bec4d4;
-      padding: 0.5rem;
-      margin-top: 1rem;
-      user-select: none;
-    }
-    [data-theme="dark"] #history-list {
-      box-shadow:
-        inset 6px 6px 12px #121316,
-        inset -6px -6px 12px #2c2c35;
-      background: var(--input-bg);
-    }
-    #history-list > div {
-      padding: 0.35rem 0.8rem;
-      border-radius: 18px;
+      margin-top: 0.8rem;
       font-weight: 600;
-      color: var(--secondary);
-      cursor: pointer;
-      transition: background-color 0.25s, color 0.25s;
-      user-select: text;
+      min-height: 1.4rem;
+      color: var(--accent-color);
+      word-break: break-word;
     }
-    #history-list > div:hover, #history-list > div:focus {
-      background: var(--primary);
-      color: white;
-      outline: none;
+    #video {
+      display: none;
+      max-width: 100%;
+      margin-top: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.2);
     }
     @media (max-width: 600px) {
       main {
-        padding: 1.5rem 1.5rem 2rem;
+        padding: 0 0.5rem;
       }
-      .flex-row {
-        flex-direction: column;
-      }
-      .flex-row > * {
-        min-width: auto;
-      }
-      button {
+      .controls, .options, .history-section, .bulk-section {
         max-width: 100%;
       }
-      header h1 {
-        font-size: 1.25rem;
+      button {
+        margin-bottom: 0.6rem;
+        width: 100%;
       }
+      button + button {
+        margin-left: 0;
+      }
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: var(--primary-color);
+      color: white;
+      user-select: none;
     }
   </style>
 </head>
-<body data-theme="light">
-
+<body>
   <header>
-    <h1>QR Code Generator</h1>
-    <label class="switch" title="Toggle Dark Mode">
-      <input type="checkbox" id="toggleTheme" aria-label="Toggle Dark Mode" />
+    <h1>QRKood</h1>
+    <label class="toggle-switch" aria-label="Toggle Dark Mode">
+      <input type="checkbox" id="toggleTheme" />
       <span class="slider"></span>
     </label>
   </header>
 
   <main>
+    <section class="controls" aria-label="QR Code data input controls">
+      <label for="dataType">Select Data Type:</label>
+      <select id="dataType" aria-describedby="dataTypeHelp">
+        <option value="url">URL</option>
+        <option value="text">Text</option>
+        <option value="email">Email</option>
+        <option value="phone">Phone</option>
+        <option value="sms">SMS</option>
+        <option value="wifi">Wi-Fi</option>
+        <option value="vcard">vCard</option>
+        <option value="geo">Geo Location</option>
+        <option value="calendar">Calendar Event</option>
+      </select>
+      <small id="dataTypeHelp">Choose the type of data for your QR code</small>
 
-    <label for="dataType">Select Data Type</label>
-    <select id="dataType" aria-label="Select QR code data type">
-      <option value="url">URL</option>
-      <option value="text">Plain Text</option>
-      <option value="email">Email</option>
-      <option value="phone">Phone Number</option>
-      <option value="sms">SMS</option>
-      <option value="wifi">Wi-Fi</option>
-      <option value="vcard">vCard</option>
-      <option value="geo">Geo Location</option>
-      <option value="calendar">Calendar Event</option>
-    </select>
+      <div id="inputFields" style="margin-top: 1rem;"></div>
 
-    <div id="inputFields" style="width: 100%; margin-top:0.75rem;"></div>
+      <label for="password">Password (optional - encrypt data):</label>
+      <input type="password" id="password" placeholder="Enter password to encrypt QR data" />
 
-    <div class="flex-row" style="margin-top: 1.5rem;">
+      <label for="size">Size (pixels):</label>
+      <input type="number" id="size" min="100" max="1000" value="300" />
 
-      <div>
-        <label for="size">Size (px)</label>
-        <input type="number" id="size" min="100" max="1000" value="300" aria-label="QR code size in pixels" />
-      </div>
+      <label for="ecLevel">Error Correction Level:</label>
+      <select id="ecLevel">
+        <option value="L">Low (7%)</option>
+        <option value="M" selected>Medium (15%)</option>
+        <option value="Q">Quartile (25%)</option>
+        <option value="H">High (30%)</option>
+      </select>
 
-      <div>
-        <label for="ecLevel">Error Correction Level</label>
-        <select id="ecLevel" aria-label="Error correction level">
-          <option value="L">Low (7%)</option>
-          <option value="M" selected>Medium (15%)</option>
-          <option value="Q">Quartile (25%)</option>
-          <option value="H">High (30%)</option>
-        </select>
-      </div>
+      <label for="fgColor">Foreground Color:</label>
+      <input type="color" id="fgColor" value="#000000" />
 
-      <div>
-        <label for="fgColor">Foreground Color</label>
-        <input type="color" id="fgColor" value="#000000" aria-label="Foreground color" />
-      </div>
+      <label for="bgColor">Background Color:</label>
+      <input type="color" id="bgColor" value="#ffffff" />
 
-      <div>
-        <label for="bgColor">Background Color</label>
-        <input type="color" id="bgColor" value="#ffffff" aria-label="Background color" />
-      </div>
-    </div>
+      <label for="logoFile">Logo/Image Overlay (optional):</label>
+      <input type="file" id="logoFile" accept="image/*" />
 
-    <label for="logoFile" style="margin-top:1.5rem;">Add Logo/Image Overlay (optional)</label>
-    <input type="file" id="logoFile" accept="image/*" aria-label="Upload logo or image overlay" />
+      <button id="generateBtn" aria-label="Generate QR Code">Generate QR Code</button>
+    </section>
 
-    <label for="password" style="margin-top:1.5rem;">Password Protect QR Data (optional)</label>
-    <input type="password" id="password" placeholder="Enter password to encrypt content" autocomplete="new-password" aria-label="Password for encryption" />
+    <section id="qrcode-container" aria-live="polite" aria-atomic="true" aria-label="Generated QR Code will appear here"></section>
 
-    <button id="generateBtn" aria-label="Generate QR Code">Generate QR Code</button>
-
-    <div id="qrcode" aria-label="Generated QR code" role="img"></div>
-
-    <div class="flex-row" style="gap: 0.75rem; margin-bottom: 1.5rem;">
+    <section class="options" aria-label="Download options for QR Code">
       <button id="downloadPNG" aria-label="Download QR code as PNG">Download PNG</button>
       <button id="downloadJPEG" aria-label="Download QR code as JPEG">Download JPEG</button>
       <button id="downloadSVG" aria-label="Download QR code as SVG">Download SVG</button>
-    </div>
+    </section>
 
-    <button id="scanBtn" aria-label="Scan QR code with device camera">Scan QR Code with Camera</button>
-    <video id="video" style="display:none;" autoplay playsinline></video>
-    <p id="scanResult" aria-live="polite"></p>
+    <section class="options" aria-label="Scan QR Code with device camera">
+      <button id="scanBtn" aria-label="Scan QR code with camera">Scan QR Code with Camera</button>
+      <video id="video" autoplay playsinline></video>
+      <div id="scanResult" role="status" aria-live="polite"></div>
+    </section>
 
-    <label for="bulkUpload" style="margin-top:1.5rem;">Bulk Generate from CSV (dataType,data)</label>
-    <input type="file" id="bulkUpload" accept=".csv" aria-label="Upload CSV for bulk QR generation" />
-    <div id="bulkResults"></div>
+    <section class="bulk-section" aria-label="Bulk QR code generation">
+      <label for="bulkUpload">Bulk Generate from CSV (format: dataType,data):</label>
+      <input type="file" id="bulkUpload" accept=".csv,text/csv" />
+      <div id="bulkResults" style="margin-top: 1rem; display: flex; flex-wrap: wrap; justify-content: center;"></div>
+    </section>
 
-    <h3 style="margin-top:1.5rem;">History (click to reload)</h3>
-    <div id="history-list" aria-label="History of generated QR codes"></div>
-
+    <section class="history-section" aria-label="History of generated QR Codes">
+      <h2>History (last 20 QR codes)</h2>
+      <div id="history-list" tabindex="0" role="list" aria-live="polite" aria-atomic="true">
+        No history yet.
+      </div>
+    </section>
   </main>
 
-  <footer>© Manik Roy 2025</footer>
+  <footer>
+    <p>© Manik Roy 2025</p>
+  </footer>
 
-  <!-- QRious Library for QR generation -->
+  <script>
+    // QRious library embedded (minimized) or you can link externally here for simplicity
+    // For demonstration, we will assume QRious is loaded externally
+    // We'll use a CDN for QRious here
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
-  <!-- CryptoJS AES for simple encryption -->
-  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const toggleTheme = document.getElementById('toggleTheme');
       const body = document.body;
+      const toggleTheme = document.getElementById("toggleTheme");
       const dataType = document.getElementById("dataType");
       const inputFields = document.getElementById("inputFields");
-      const generateBtn = document.getElementById("generateBtn");
-      const qrcodeContainer = document.getElementById("qrcode");
       const sizeInput = document.getElementById("size");
+      const generateBtn = document.getElementById("generateBtn");
+      const qrcodeContainer = document.getElementById("qrcode-container");
       const ecLevelSelect = document.getElementById("ecLevel");
       const fgColorInput = document.getElementById("fgColor");
       const bgColorInput = document.getElementById("bgColor");
@@ -551,380 +449,273 @@
             break;
           default:
             inputFields.innerHTML = `
-              <label for="textInput">Text</label>
-              <textarea id="textInput" rows="4" placeholder="Enter text here"></textarea>`;
+              <label for="defaultInput">Data</label>
+              <textarea id="defaultInput" rows="3" placeholder="Enter data"></textarea>`;
         }
       }
-
       renderInputs(dataType.value);
-
       dataType.addEventListener('change', () => {
         renderInputs(dataType.value);
-        clearQRCode();
       });
 
-      // Utility: Encrypt text with password or return plain text if no password
-      function encryptText(text, password) {
-        if(password && password.trim() !== '') {
-          try {
-            return CryptoJS.AES.encrypt(text, password).toString();
-          } catch(e) {
-            alert('Encryption failed: ' + e.message);
-            return text;
-          }
+      // Build QR content based on data type and input values
+      function buildQRContent(){
+        let value = "";
+        const pw = passwordInput.value.trim();
+        function encrypt(text){
+          if(!pw) return text;
+          return CryptoJS.AES.encrypt(text, pw).toString();
         }
-        return text;
-      }
-
-      // Compose data string for QR code based on inputs & dataType
-      function getDataForQRCode() {
-        const type = dataType.value;
-        let data = "";
-        switch(type){
+        switch(dataType.value){
           case "url":
-            const url = document.getElementById("urlInput").value.trim();
-            if(!url) throw 'URL is required';
-            data = url;
+            {
+              const url = document.getElementById("urlInput").value.trim();
+              value = url;
+            }
             break;
           case "text":
-            const text = document.getElementById("textInput").value.trim();
-            if(!text) throw 'Text is required';
-            data = text;
+            {
+              const txt = document.getElementById("textInput").value.trim();
+              value = txt;
+            }
             break;
           case "email":
-            const email = document.getElementById("emailInput").value.trim();
-            if(!email) throw 'Email is required';
-            data = `mailto:${email}`;
+            {
+              const email = document.getElementById("emailInput").value.trim();
+              value = `mailto:${email}`;
+            }
             break;
           case "phone":
-            const phone = document.getElementById("phoneInput").value.trim();
-            if(!phone) throw 'Phone number is required';
-            data = `tel:${phone}`;
+            {
+              const phone = document.getElementById("phoneInput").value.trim();
+              value = `tel:${phone}`;
+            }
             break;
           case "sms":
-            const smsPhone = document.getElementById("smsPhone").value.trim();
-            const smsMsg = document.getElementById("smsMsg").value.trim();
-            if(!smsPhone) throw 'SMS phone number is required';
-            data = `SMSTO:${smsPhone}:${smsMsg}`;
+            {
+              const phone = document.getElementById("smsPhone").value.trim();
+              const msg = document.getElementById("smsMsg").value.trim();
+              value = `SMSTO:${phone}:${msg}`;
+            }
             break;
           case "wifi":
-            const ssid = document.getElementById("wifiSSID").value.trim();
-            const typeEnc = document.getElementById("wifiType").value;
-            const password = document.getElementById("wifiPassword").value;
-            if(!ssid) throw 'Wi-Fi SSID is required';
-            if(typeEnc === 'nopass') {
-              data = `WIFI:T:nopass;S:${ssid};;`;
-            } else {
-              data = `WIFI:T:${typeEnc};S:${ssid};P:${password};;`;
+            {
+              const ssid = document.getElementById("wifiSSID").value.trim();
+              const type = document.getElementById("wifiType").value;
+              const password = document.getElementById("wifiPassword").value.trim();
+              // Format: WIFI:T:WPA;S:mynetwork;P:mypass;;
+              value = `WIFI:T:${type};S:${ssid};P:${password};;`;
             }
             break;
           case "vcard":
-            const name = document.getElementById("vcardName").value.trim();
-            const org = document.getElementById("vcardOrg").value.trim();
-            const title = document.getElementById("vcardTitle").value.trim();
-            const vEmail = document.getElementById("vcardEmail").value.trim();
-            const vPhone = document.getElementById("vcardPhone").value.trim();
-            if(!name) throw 'vCard name is required';
-            data = `BEGIN:VCARD
-VERSION:3.0
-N:${name}
-ORG:${org}
-TITLE:${title}
-EMAIL:${vEmail}
-TEL:${vPhone}
-END:VCARD`;
+            {
+              const name = document.getElementById("vcardName").value.trim();
+              const org = document.getElementById("vcardOrg").value.trim();
+              const title = document.getElementById("vcardTitle").value.trim();
+              const email = document.getElementById("vcardEmail").value.trim();
+              const phone = document.getElementById("vcardPhone").value.trim();
+              value = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nORG:${org}\nTITLE:${title}\nEMAIL:${email}\nTEL:${phone}\nEND:VCARD`;
+            }
             break;
           case "geo":
-            const lat = document.getElementById("geoLat").value.trim();
-            const lng = document.getElementById("geoLng").value.trim();
-            if(!lat || !lng) throw 'Latitude and Longitude are required';
-            data = `geo:${lat},${lng}`;
+            {
+              const lat = document.getElementById("geoLat").value.trim();
+              const lng = document.getElementById("geoLng").value.trim();
+              value = `geo:${lat},${lng}`;
+            }
             break;
           case "calendar":
-            const summary = document.getElementById("calSummary").value.trim();
-            const start = document.getElementById("calStart").value;
-            const end = document.getElementById("calEnd").value;
-            const location = document.getElementById("calLocation").value.trim();
-            if(!summary || !start || !end) throw 'Event summary, start and end times are required';
-            // Format to iCalendar
-            function formatDateTime(s){
-              return s.replace(/[-:]/g,"").replace(/\..+/, "") + "Z";
+            {
+              const summary = document.getElementById("calSummary").value.trim();
+              const start = document.getElementById("calStart").value.trim();
+              const end = document.getElementById("calEnd").value.trim();
+              const location = document.getElementById("calLocation").value.trim();
+              if(!summary || !start){
+                alert("Event summary and start time are required.");
+                return null;
+              }
+              const dtStart = start.replace(/-|:|\.\d+/g, '');
+              const dtEnd = end ? end.replace(/-|:|\.\d+/g, '') : dtStart;
+              value =
+                `BEGIN:VEVENT\nSUMMARY:${summary}\nDTSTART:${dtStart}\nDTEND:${dtEnd}\nLOCATION:${location}\nEND:VEVENT`;
             }
-            data = `BEGIN:VEVENT
-SUMMARY:${summary}
-DTSTART:${formatDateTime(start)}
-DTEND:${formatDateTime(end)}
-LOCATION:${location}
-END:VEVENT`;
             break;
           default:
-            data = document.getElementById("textInput").value.trim() || "Hello World";
+            {
+              const def = document.getElementById("defaultInput");
+              value = def ? def.value.trim() : "";
+            }
         }
-        // Encrypt if password provided
-        const pwd = passwordInput.value;
-        if(pwd) data = encryptText(data, pwd);
-        return data;
+        if(!value){
+          alert("Please enter valid data.");
+          return null;
+        }
+        if(passwordInput.value.trim()){
+          value = encrypt(value);
+        }
+        return value;
       }
 
-      // Clear QR code area
-      function clearQRCode(){
+      function drawQRCode(){
+        const content = buildQRContent();
+        if(!content) return;
+        const size = parseInt(sizeInput.value, 10) || 300;
+        const ecLevel = ecLevelSelect.value || 'M';
+        const fg = fgColorInput.value || '#000000';
+        const bg = bgColorInput.value || '#ffffff';
+
+        // Clear previous
         qrcodeContainer.innerHTML = "";
-        currentLogoImg = null;
-      }
 
-      // Generate QR Code canvas with options and optional logo overlay
-      function generateQRCode(){
-        try {
-          const qrSize = parseInt(sizeInput.value) || 300;
-          if(qrSize < 100 || qrSize > 1000) {
-            alert("Size must be between 100 and 1000 pixels.");
-            return;
-          }
-          const ecLevel = ecLevelSelect.value || "M";
-          const fg = fgColorInput.value || "#000000";
-          const bg = bgColorInput.value || "#ffffff";
+        qr = new QRious({
+          value: content,
+          size: size,
+          level: ecLevel,
+          background: bg,
+          foreground: fg,
+        });
 
-          const data = getDataForQRCode();
+        // Draw QR to canvas
+        const canvas = qr.canvas;
 
-          clearQRCode();
-
-          qr = new QRious({
-            value: data,
-            size: qrSize,
-            level: ecLevel,
-            background: bg,
-            foreground: fg,
-          });
-
-          // Create canvas to display
-          const canvas = qr.canvas;
-          canvas.setAttribute("aria-label", "QR code image");
+        if(logoFileInput.files.length > 0){
+          const file = logoFileInput.files[0];
+          const ctx = canvas.getContext('2d');
+          const img = new Image();
+          img.onload = () => {
+            const scale = 0.2; // logo size relative to qr
+            const w = canvas.width * scale;
+            const h = canvas.height * scale;
+            const x = (canvas.width - w) / 2;
+            const y = (canvas.height - h) / 2;
+            ctx.drawImage(img, x, y, w, h);
+            qrcodeContainer.appendChild(canvas);
+            saveHistory(content, canvas.toDataURL());
+          };
+          const reader = new FileReader();
+          reader.onload = e => {
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        } else {
           qrcodeContainer.appendChild(canvas);
-
-          // Add logo overlay if available
-          if(currentLogoImg){
-            const ctx = canvas.getContext('2d');
-            const logoSize = qrSize * 0.25;
-            const x = (qrSize - logoSize) / 2;
-            const y = (qrSize - logoSize) / 2;
-            ctx.drawImage(currentLogoImg, x, y, logoSize, logoSize);
-          }
-
-          // Save to history
-          saveToHistory({data, size: qrSize, ecLevel, fg, bg, timestamp: Date.now()});
-        } catch(e) {
-          alert("Error generating QR code: " + e);
+          saveHistory(content, canvas.toDataURL());
         }
       }
 
-      // Save generated QR code info to localStorage history (keep max 20)
-      function saveToHistory(entry){
-        let history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
-        history.unshift(entry);
-        if(history.length > 20) history.pop();
-        localStorage.setItem('qrHistory', JSON.stringify(history));
-        renderHistory();
-      }
+      generateBtn.addEventListener('click', drawQRCode);
 
-      // Render history list
-      function renderHistory(){
-        let history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
-        historyList.innerHTML = "";
-        if(history.length === 0){
-          historyList.textContent = "No history yet.";
+      // Download functions
+      function downloadCanvas(format){
+        if(!qr) return;
+        const canvas = qr.canvas;
+        const link = document.createElement('a');
+        if(format === 'svg'){
+          // QRious can export svg as string
+          const svgStr = qr.toDataURL().replace(/^data:image\/png;base64,/, '');
+          // But QRious does not have direct svg export, so fallback to PNG for now
+          alert('SVG export is not supported directly. Downloading PNG instead.');
+          link.href = canvas.toDataURL("image/png");
+          link.download = 'QRKood.png';
+          link.click();
           return;
         }
+        if(format === 'png'){
+          link.href = canvas.toDataURL("image/png");
+          link.download = 'QRKood.png';
+        } else if(format === 'jpeg'){
+          link.href = canvas.toDataURL("image/jpeg");
+          link.download = 'QRKood.jpg';
+        }
+        link.click();
+      }
+
+      downloadPNGBtn.addEventListener('click', () => downloadCanvas('png'));
+      downloadJPEGBtn.addEventListener('click', () => downloadCanvas('jpeg'));
+      downloadSVGBtn.addEventListener('click', () => downloadCanvas('svg'));
+
+      // History (store last 20 in localStorage)
+      function saveHistory(data, imgData){
+        let history = JSON.parse(localStorage.getItem('qrkoodHistory') || '[]');
+        history.unshift({data, imgData, date: Date.now()});
+        if(history.length > 20) history.pop();
+        localStorage.setItem('qrkoodHistory', JSON.stringify(history));
+        renderHistory();
+      }
+      function renderHistory(){
+        let history = JSON.parse(localStorage.getItem('qrkoodHistory') || '[]');
+        if(history.length === 0){
+          historyList.innerHTML = "No history yet.";
+          return;
+        }
+        historyList.innerHTML = "";
         history.forEach((item, idx) => {
           const div = document.createElement('div');
-          const date = new Date(item.timestamp);
           div.tabIndex = 0;
-          div.title = `Reload QR code generated on ${date.toLocaleString()}`;
-          div.textContent = `[${date.toLocaleDateString()} ${date.toLocaleTimeString()}] ${item.data.slice(0, 30)}...`;
+          div.role = "listitem";
+          div.title = item.data;
+          div.textContent = item.data.length > 40 ? item.data.substring(0,37) + "..." : item.data;
           div.addEventListener('click', () => {
-            // Load saved data to UI
-            try {
-              dataType.value = guessDataType(item.data) || "text";
-              renderInputs(dataType.value);
-              setTimeout(() => {
-                fillInputsFromData(dataType.value, item.data);
-                sizeInput.value = item.size || 300;
-                ecLevelSelect.value = item.ecLevel || "M";
-                fgColorInput.value = item.fg || "#000000";
-                bgColorInput.value = item.bg || "#ffffff";
-                generateQRCode();
-              }, 50);
-            } catch(e){
-              alert("Failed to load history item: "+ e);
-            }
+            passwordInput.value = "";
+            // Load this QR code into main canvas
+            qr = new QRious({
+              value: item.data,
+              size: parseInt(sizeInput.value, 10) || 300,
+              level: ecLevelSelect.value || 'M',
+              background: bgColorInput.value || '#ffffff',
+              foreground: fgColorInput.value || '#000000',
+            });
+            qrcodeContainer.innerHTML = "";
+            qrcodeContainer.appendChild(qr.canvas);
           });
           historyList.appendChild(div);
         });
       }
 
-      // Guess data type from data string
-      function guessDataType(data) {
-        if(data.startsWith("http") || data.startsWith("www")) return "url";
-        if(data.startsWith("mailto:")) return "email";
-        if(data.startsWith("tel:")) return "phone";
-        if(data.startsWith("SMSTO:")) return "sms";
-        if(data.startsWith("WIFI:")) return "wifi";
-        if(data.startsWith("BEGIN:VCARD")) return "vcard";
-        if(data.startsWith("geo:")) return "geo";
-        if(data.startsWith("BEGIN:VEVENT")) return "calendar";
-        return "text";
-      }
+      renderHistory();
 
-      // Fill inputs based on data type and raw data (basic parsing)
-      function fillInputsFromData(type, data) {
-        switch(type){
-          case "url":
-            document.getElementById("urlInput").value = data;
-            break;
-          case "text":
-            document.getElementById("textInput").value = data;
-            break;
-          case "email":
-            document.getElementById("emailInput").value = data.replace("mailto:", "");
-            break;
-          case "phone":
-            document.getElementById("phoneInput").value = data.replace("tel:", "");
-            break;
-          case "sms":
-            let smsMatch = data.match(/^SMSTO:(.*?):(.*)$/);
-            if(smsMatch) {
-              document.getElementById("smsPhone").value = smsMatch[1];
-              document.getElementById("smsMsg").value = smsMatch[2];
-            }
-            break;
-          case "wifi":
-            // Parsing WIFI string is complex, skip for now
-            break;
-          case "vcard":
-            // Parsing vCard is complex, skip for now
-            break;
-          case "geo":
-            let geoMatch = data.match(/^geo:(.*?),(.*)$/);
-            if(geoMatch){
-              document.getElementById("geoLat").value = geoMatch[1];
-              document.getElementById("geoLng").value = geoMatch[2];
-            }
-            break;
-          case "calendar":
-            // Complex iCal parsing, skip for now
-            break;
-        }
-      }
-
-      // Handle logo file upload and load image object for overlay
-      logoFileInput.addEventListener('change', e => {
-        const file = e.target.files[0];
-        if(!file) return;
-        if(!file.type.startsWith('image/')){
-          alert("Please select a valid image file for logo overlay.");
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = function(evt){
-          const img = new Image();
-          img.onload = () => {
-            currentLogoImg = img;
-            if(qr) generateQRCode();
-          };
-          img.src = evt.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-
-      // Generate button click
-      generateBtn.addEventListener('click', () => {
-        generateQRCode();
-      });
-
-      // Download helpers
-      function downloadURI(uri, name){
-        const link = document.createElement("a");
-        link.href = uri;
-        link.download = name;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-      }
-
-      // Download PNG
-      downloadPNGBtn.addEventListener('click', () => {
-        if(!qr || !qr.canvas){
-          alert("Generate a QR code first!");
-          return;
-        }
-        qr.canvas.toBlob(blob => {
-          const url = URL.createObjectURL(blob);
-          downloadURI(url, "qrcode.png");
-          URL.revokeObjectURL(url);
-        });
-      });
-
-      // Download JPEG
-      downloadJPEGBtn.addEventListener('click', () => {
-        if(!qr || !qr.canvas){
-          alert("Generate a QR code first!");
-          return;
-        }
-        const jpegDataUrl = qr.canvas.toDataURL("image/jpeg", 0.92);
-        downloadURI(jpegDataUrl, "qrcode.jpg");
-      });
-
-      // Download SVG (limited support - recreate with qrious.svg())
-      downloadSVGBtn.addEventListener('click', () => {
-        if(!qr) {
-          alert("Generate a QR code first!");
-          return;
-        }
-        // QRious doesn't generate SVG directly, workaround:
-        const svgData = qr.toDataURL('image/svg+xml');
-        downloadURI(svgData, 'qrcode.svg');
-      });
-
-      // Scan QR code with camera using jsQR (needs to load script)
+      // QR Scan feature
       let scanning = false;
-      let videoStream = null;
-      scanBtn.addEventListener('click', async () => {
+      let stream;
+      let jsQRScriptLoaded = false;
+
+      scanBtn.addEventListener('click', () => {
         if(scanning){
           stopScan();
-          return;
+        } else {
+          startScan();
         }
-        if(!('mediaDevices' in navigator)) {
-          alert("Camera API not supported on this device/browser.");
-          return;
-        }
-        scanResult.textContent = "";
-        try {
-          videoStream = await navigator.mediaDevices.getUserMedia({video: { facingMode: "environment" }});
-          video.srcObject = videoStream;
+      });
+
+      function startScan(){
+        scanResult.textContent = "Starting camera...";
+        navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}}).then(s => {
+          stream = s;
+          video.srcObject = stream;
+          video.setAttribute("playsinline", true);
           video.style.display = "block";
           scanning = true;
           scanBtn.textContent = "Stop Scanning";
           scanFrame();
-        } catch(e) {
-          alert("Could not access camera: " + e.message);
-        }
-      });
+        }).catch(err => {
+          alert("Camera access denied or not available.");
+          scanResult.textContent = "";
+        });
+      }
 
       function stopScan(){
         scanning = false;
         scanBtn.textContent = "Scan QR Code with Camera";
-        video.style.display = "none";
         scanResult.textContent = "";
-        if(videoStream){
-          videoStream.getTracks().forEach(track => track.stop());
-          videoStream = null;
+        video.style.display = "none";
+        if(stream){
+          stream.getTracks().forEach(track => track.stop());
         }
       }
 
-      // Load jsQR dynamically to avoid bloating
-      let jsQRScriptLoaded = false;
-      function loadJsQRScript() {
+      function loadJsQRScript(){
         return new Promise((resolve, reject) => {
-          if(jsQRScriptLoaded) return resolve();
+          if(jsQRScriptLoaded) resolve();
           const script = document.createElement('script');
           script.src = "https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js";
           script.onload = () => {
@@ -976,7 +767,7 @@ END:VEVENT`;
             // Format: dataType,data
             const parts = line.split(",");
             if(parts.length < 2){
-              bulkResults.innerHTML += `<p style="color: red;">Line ${idx+1}: Invalid format.</p>`;
+              bulkResults.innerHTML += `<p style="color: var(--error-color);">Line ${idx+1}: Invalid format.</p>`;
               return;
             }
             const bulkType = parts[0].trim();
@@ -994,15 +785,12 @@ END:VEVENT`;
               img.title = bulkData;
               bulkResults.appendChild(img);
             } catch(e){
-              bulkResults.innerHTML += `<p style="color: red;">Line ${idx+1}: Error generating QR code.</p>`;
+              bulkResults.innerHTML += `<p style="color: var(--error-color);">Line ${idx+1}: Error generating QR code.</p>`;
             }
           });
         };
         reader.readAsText(file);
       });
-
-      // Initial render history
-      renderHistory();
 
     });
   </script>
